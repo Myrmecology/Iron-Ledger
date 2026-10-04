@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    <h1>{{ username }}'s lifts</h1>
+    <p class="lede">Your records, totals, and latest sets.</p>
+
+    {% if totals.entries == 0 %}
+        <div class="empty">
+            <p>You haven't logged anything yet. Your personal records will show up here once you do.</p>
+            <a class="button" href="/log">Log your first lift</a>
+        </div>
+    {% else %}
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value">{{ totals.days }}</span>
+                <span class="stat-label">training days</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">{{ totals.entries }}</span>
+                <span class="stat-label">entries logged</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">{{ "{:,.0f}".format(totals.volume) }}</span>
+                <span class="stat-label">total pounds lifted</span>
+            </div>
+        </div>
+
+        <section class="record-board">
+            <h2>Record board</h2>
+            <p class="board-note">Your heaviest weight for each exercise.</p>
+            <ol class="records">
+                {% for record in records %}
+                    <li class="record">
+                        <span class="record-name">{{ record.name }}</span>
+                        <span class="record-weight">{{ record.best | lbs }}</span>
+                        <span class="record-date">Set on {{ record.date | pretty_date }}</span>
+                    </li>
+                {% endfor %}
+            </ol>
+        </section>
+
+        <h2>Latest entries</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Exercise</th>
+                        <th class="num">Sets × reps</th>
+                        <th class="num">Weight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in recent %}
+                        <tr>
+                            <td>{{ entry.date | pretty_date }}</td>
+                            <td>{{ entry.name }}</td>
+                            <td class="num">{{ entry.sets }} × {{ entry.reps }}</td>
+                            <td class="num">{{ entry.weight | lbs }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="hint"><a href="/history">See all entries</a></p>
+    {% endif %}
+{% endblock %}

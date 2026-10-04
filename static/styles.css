@@ -1,0 +1,474 @@
+/* ===== Design tokens =====
+   Colors borrow from a gym: chalk, iron, and the colors of
+   competition weight plates (red, blue, yellow, green). */
+:root {
+    --chalk: #f2f3f0;
+    --surface: #ffffff;
+    --iron: #1e2935;
+    --iron-soft: #2b3846;
+    --steel: #5e6b78;
+    --line: #d9ddd8;
+
+    --plate-red: #c2362f;
+    --plate-blue: #1d5bb8;
+    --plate-yellow: #e3b23c;
+    --plate-green: #2f8a4c;
+
+    --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --font-body: "Barlow", "Segoe UI", system-ui, sans-serif;
+
+    --radius-small: 4px;
+    --radius: 8px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--chalk);
+    color: var(--iron);
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+}
+
+a {
+    color: var(--plate-blue);
+}
+
+:focus-visible {
+    outline: 3px solid var(--plate-yellow);
+    outline-offset: 2px;
+}
+
+/* ===== Header ===== */
+.site-header {
+    background: var(--iron);
+}
+
+.nav {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+}
+
+.brand {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-links a {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-small);
+    color: #c9d1d9;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: #fff;
+    background: var(--iron-soft);
+}
+
+.nav-links a[aria-current="page"] {
+    color: #fff;
+    box-shadow: inset 0 -3px 0 var(--plate-yellow);
+}
+
+.nav-links .nav-quiet {
+    color: #8e9aa6;
+}
+
+/* ===== Flash message ===== */
+.flash {
+    max-width: 960px;
+    margin: 1.25rem auto 0;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--plate-green);
+    background: var(--surface);
+    font-weight: 500;
+    width: calc(100% - 2.5rem);
+}
+
+/* ===== Page shell ===== */
+.page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.25rem 1.25rem 4rem;
+}
+
+h1,
+h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 0.5rem;
+}
+
+h1 {
+    font-size: clamp(2.2rem, 5vw, 3rem);
+}
+
+h2 {
+    font-size: 1.6rem;
+    margin-top: 2.5rem;
+}
+
+.lede {
+    color: var(--steel);
+    margin: 0 0 1.75rem;
+    max-width: 60ch;
+}
+
+/* ===== Stats row ===== */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 2rem;
+}
+
+.stat {
+    background: var(--surface);
+    padding: 1rem 1.25rem;
+}
+
+.stat-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 2.1rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.stat-label {
+    color: var(--steel);
+    font-size: 0.95rem;
+}
+
+/* ===== Record board: the signature element =====
+   Styled like the records board on a gym wall. Each row gets
+   a plate-colored edge, cycling red, blue, yellow, green. */
+.record-board {
+    background: var(--iron);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 1.5rem 1.5rem 0.75rem;
+}
+
+.record-board h2 {
+    margin-top: 0;
+    color: #fff;
+}
+
+.record-board .board-note {
+    color: #9aa6b2;
+    margin: 0 0 1rem;
+}
+
+.records {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.record {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding: 0.85rem 0 0.85rem 1rem;
+    border-top: 1px solid var(--iron-soft);
+    border-left: 6px solid var(--plate-red);
+}
+
+.record:first-child {
+    border-top: 0;
+}
+
+.record:nth-child(4n + 2) { border-left-color: var(--plate-blue); }
+.record:nth-child(4n + 3) { border-left-color: var(--plate-yellow); }
+.record:nth-child(4n + 4) { border-left-color: var(--plate-green); }
+
+.record-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.record-date {
+    grid-column: 1;
+    color: #9aa6b2;
+    font-size: 0.9rem;
+}
+
+.record-weight {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ===== Tables ===== */
+.table-wrap {
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+}
+
+th {
+    color: var(--steel);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+tr:last-child td {
+    border-bottom: 0;
+}
+
+td.num,
+th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+td.notes {
+    white-space: normal;
+    color: var(--steel);
+    min-width: 12rem;
+}
+
+/* ===== Forms ===== */
+.form-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    max-width: 560px;
+}
+
+.form-card.narrow {
+    max-width: 400px;
+}
+
+.field {
+    margin-bottom: 1.15rem;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.hint {
+    color: var(--steel);
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #b9c0c7;
+    border-radius: var(--radius-small);
+    background: #fff;
+    color: var(--iron);
+    font: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--plate-blue);
+    box-shadow: 0 0 0 3px rgba(29, 91, 184, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 4.5rem;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ===== Buttons ===== */
+.button {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    border: 0;
+    border-radius: var(--radius-small);
+    background: var(--plate-blue);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background: #174b98;
+}
+
+.button-delete {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-small);
+    background: none;
+    color: var(--plate-red);
+    font: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.button-delete:hover {
+    border-color: var(--plate-red);
+}
+
+/* ===== Empty states ===== */
+.empty {
+    background: var(--surface);
+    border: 1px dashed #b9c0c7;
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 560px;
+}
+
+.empty p {
+    margin-top: 0;
+}
+
+/* ===== Progress page ===== */
+.picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.picker .field {
+    margin: 0;
+    min-width: 240px;
+}
+
+.chart-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+.chart-box {
+    position: relative;
+    height: 340px;
+}
+
+.chart-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin: 0 0 1rem;
+    color: var(--steel);
+}
+
+.chart-summary strong {
+    color: var(--iron);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* ===== Apology page ===== */
+.apology {
+    max-width: 560px;
+    border-left: 6px solid var(--plate-red);
+    background: var(--surface);
+    padding: 1.5rem 1.75rem;
+}
+
+.apology-code {
+    color: var(--steel);
+    margin: 0 0 0.25rem;
+}
+
+.apology h1 {
+    font-size: 2rem;
+}
+
+/* ===== Small screens ===== */
+@media (max-width: 600px) {
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-card {
+        padding: 1.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Text for screen readers only */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}

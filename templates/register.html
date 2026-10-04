@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <h1>Create an account</h1>
+    <p class="lede">Log your lifts and watch your numbers climb.</p>
+
+    <form action="/register" method="post" class="form-card narrow">
+        <div class="field">
+            <label for="username">Username</label>
+            <input autocomplete="username" autofocus id="username" maxlength="30" name="username" type="text" required>
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input autocomplete="new-password" id="password" minlength="8" name="password" type="password" required>
+            <p class="hint">At least 8 characters.</p>
+        </div>
+        <div class="field">
+            <label for="confirmation">Confirm password</label>
+            <input autocomplete="new-password" id="confirmation" minlength="8" name="confirmation" type="password" required>
+        </div>
+        <button class="button" type="submit">Create account</button>
+    </form>
+{% endblock %}

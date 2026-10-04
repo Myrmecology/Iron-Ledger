@@ -1,0 +1,50 @@
+# Database: contains usernames and password hashes
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask login sessions
+flask_session/
+
+# Secrets and environment variables (for any future API keys)
+.env
+.env.*
+instance/
+
+# YubiKey / GPG key material
+*.asc
+*.gpg
+*.key
+*.pem
+secring.*
+pubring.*
+.gnupg/
+
+# SSH keys
+id_rsa
+id_ed25519
+*.pub
+
+# Python cache and build files
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Logs
+*.log
+
+# Editor settings
+.vscode/
+.idea/
+
+# Windows and Mac system files
+Thumbs.db
+desktop.ini
+.DS_Store

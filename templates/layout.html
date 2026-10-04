@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+        <link href="/static/styles.css" rel="stylesheet">
+
+        <title>Iron Ledger: {% block title %}{% endblock %}</title>
+    </head>
+
+    <body>
+
+        <header class="site-header">
+            <nav class="nav">
+                <a class="brand" href="/">Iron Ledger</a>
+                <ul class="nav-links">
+                    {% if session["user_id"] %}
+                        <li><a href="/" {% if request.path == "/" %}aria-current="page"{% endif %}>Dashboard</a></li>
+                        <li><a href="/log" {% if request.path == "/log" %}aria-current="page"{% endif %}>Log</a></li>
+                        <li><a href="/history" {% if request.path == "/history" %}aria-current="page"{% endif %}>History</a></li>
+                        <li><a href="/progress" {% if request.path == "/progress" %}aria-current="page"{% endif %}>Progress</a></li>
+                        <li><a class="nav-quiet" href="/logout">Log out</a></li>
+                    {% else %}
+                        <li><a href="/login" {% if request.path == "/login" %}aria-current="page"{% endif %}>Log in</a></li>
+                        <li><a href="/register" {% if request.path == "/register" %}aria-current="page"{% endif %}>Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash" role="status">
+                    {{ messages | join(" ") }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <main class="page">
+            {% block main %}{% endblock %}
+        </main>
+
+        {% block scripts %}{% endblock %}
+
+    </body>
+
+</html>

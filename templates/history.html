@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <h1>History</h1>
+    <p class="lede">Every entry you've logged, newest first.</p>
+
+    {% if entries %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Exercise</th>
+                        <th class="num">Sets × reps</th>
+                        <th class="num">Weight</th>
+                        <th>Notes</th>
+                        <th><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.date | pretty_date }}</td>
+                            <td>{{ entry.name }}</td>
+                            <td class="num">{{ entry.sets }} × {{ entry.reps }}</td>
+                            <td class="num">{{ entry.weight | lbs }}</td>
+                            <td class="notes">{{ entry.notes or "" }}</td>
+                            <td>
+                                <form action="/delete" method="post" onsubmit="return confirm('Delete this entry?');">
+                                    <input name="id" type="hidden" value="{{ entry.id }}">
+                                    <button class="button-delete" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty">
+            <p>No entries yet.</p>
+            <a class="button" href="/log">Log a lift</a>
+        </div>
+    {% endif %}
+{% endblock %}

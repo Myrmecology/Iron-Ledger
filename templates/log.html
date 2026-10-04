@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log a lift
+{% endblock %}
+
+{% block main %}
+    <h1>Log a lift</h1>
+    <p class="lede">Record one exercise at a time. Use 0 for bodyweight moves like pull-ups.</p>
+
+    <form action="/log" method="post" class="form-card">
+        <div class="field">
+            <label for="exercise">Exercise</label>
+            <select id="exercise" name="exercise" required>
+                <option disabled selected value="">Choose an exercise</option>
+                {% for exercise in exercises %}
+                    <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+                {% endfor %}
+                <option value="new">+ Add a new exercise</option>
+            </select>
+        </div>
+
+        <div class="field" id="new-exercise-field" hidden>
+            <label for="new_exercise">New exercise name</label>
+            <input autocomplete="off" id="new_exercise" maxlength="50" name="new_exercise" type="text">
+            <p class="hint">It will be saved to your list for next time.</p>
+        </div>
+
+        <div class="field">
+            <label for="date">Date</label>
+            <input id="date" max="{{ today }}" name="date" type="date" value="{{ today }}" required>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label for="sets">Sets</label>
+                <input id="sets" inputmode="numeric" max="100" min="1" name="sets" type="number" required>
+            </div>
+            <div class="field">
+                <label for="reps">Reps</label>
+                <input id="reps" inputmode="numeric" max="1000" min="1" name="reps" type="number" required>
+            </div>
+            <div class="field">
+                <label for="weight">Weight (lb)</label>
+                <input id="weight" inputmode="decimal" max="2000" min="0" name="weight" step="0.5" type="number" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="notes">Notes <span class="hint">(optional)</span></label>
+            <textarea id="notes" maxlength="200" name="notes"></textarea>
+        </div>
+
+        <button class="button" type="submit">Save entry</button>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Show the "new exercise" box only when "+ Add a new exercise" is chosen
+        const select = document.querySelector("#exercise");
+        const newField = document.querySelector("#new-exercise-field");
+        const newInput = document.querySelector("#new_exercise");
+
+        select.addEventListener("change", function () {
+            const addingNew = select.value === "new";
+            newField.hidden = !addingNew;
+            newInput.required = addingNew;
+            if (addingNew) {
+                newInput.focus();
+            }
+        });
+    </script>
+{% endblock %}

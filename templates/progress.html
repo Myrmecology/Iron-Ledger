@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Progress
+{% endblock %}
+
+{% block main %}
+    <h1>Progress</h1>
+    <p class="lede">Your heaviest weight on each training day for one exercise.</p>
+
+    {% if not logged %}
+        <div class="empty">
+            <p>Log a few lifts first, and your progress chart will appear here.</p>
+            <a class="button" href="/log">Log a lift</a>
+        </div>
+    {% else %}
+        <form action="/progress" method="get" class="picker">
+            <div class="field">
+                <label for="exercise_id">Exercise</label>
+                <select id="exercise_id" name="exercise_id" onchange="this.form.submit()">
+                    {% for exercise in logged %}
+                        <option value="{{ exercise.id }}" {% if exercise.id == selected.id %}selected{% endif %}>{{ exercise.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <noscript><button class="button" type="submit">Show</button></noscript>
+        </form>
+
+        <div class="chart-card">
+            <p class="chart-summary">
+                <span>Best <strong>{{ best | lbs }}</strong></span>
+                <span>Change since first entry <strong>{% if gain > 0 %}+{% endif %}{{ "%g" | format(gain) }} lb</strong></span>
+                <span>Training days <strong>{{ values | length }}</strong></span>
+            </p>
+            <div class="chart-box">
+                <canvas id="chart" aria-label="Line chart of heaviest weight per day for {{ selected.name }}" role="img"></canvas>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {% if logged %}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        <script>
+            // Data passed from Flask, converted safely to JavaScript with tojson
+            const labels = {{ labels | tojson }};
+            const values = {{ values | tojson }};
+
+            new Chart(document.querySelector("#chart"), {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Heaviest weight (lb)",
+                        data: values,
+                        borderColor: "#1d5bb8",
+                        backgroundColor: "#1d5bb8",
+                        pointBackgroundColor: "#e3b23c",
+                        pointBorderColor: "#1e2935",
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        borderWidth: 3,
+                        tension: 0.25
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => context.parsed.y + " lb"
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { callback: (value) => value + " lb" },
+                            grid: { color: "#e6e9e5" }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}
