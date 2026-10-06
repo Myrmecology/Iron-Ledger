@@ -1,5 +1,5 @@
 # Iron Ledger
-#### Video Demo: 
+#### Video Demo: https://www.youtube.com/watch?v=L6l5MI_29v8
 #### Description:
 
 Iron Ledger is a web application for logging strength training workouts and tracking progress over time. Users create an account, record each exercise they perform along with the sets, reps, and weight, and the app turns those entries into personal records, training totals, and a progress chart for each lift. It is built for anyone who lifts weights and wants a simple, focused place to see whether they are getting stronger. I chose to build this application because I have a passion for working out and keeping track of my progress.
@@ -35,3 +35,5 @@ For the visual design, I wanted something elegant that fits the subject. The col
 ## Final Thoughts
 
 I would like to thank Harvard University for an excellent class. 
+
+# FOR A VIDEO DEMO PLEASE CHECK OUT: https://www.youtube.com/watch?v=L6l5MI_29v8
