@@ -2,6 +2,36 @@
 #### Video Demo: https://www.youtube.com/watch?v=L6l5MI_29v8
 #### Description:
 
+## Getting STARTED:
+
+### Requirements
+- Python 3.10 or newer
+- Git
+
+### Setup
+1. Clone the repository and move into it:
+```bash
+   git clone <your-repo-url>
+   cd <your-repo-folder>
+```
+2. Create and activate a virtual environment:
+```bash
+   python -m venv .venv
+   source .venv/Scripts/activate   # Windows (Git Bash)
+   source .venv/bin/activate       # macOS / Linux
+```
+3. Install the dependencies:
+```bash
+   pip install -r requirements.txt
+```
+4. Start the app:
+```bash
+   flask run
+```
+5. Open http://127.0.0.1:5000 in your browser and register an account.
+
+The SQLite database (`workout.db`) is created automatically on first run, including the preset exercises, so no database setup is needed.
+
 Iron Ledger is a web application for logging strength training workouts and tracking progress over time. Users create an account, record each exercise they perform along with the sets, reps, and weight, and the app turns those entries into personal records, training totals, and a progress chart for each lift. It is built for anyone who lifts weights and wants a simple, focused place to see whether they are getting stronger. I chose to build this application because I have a passion for working out and keeping track of my progress.
 
 The app is written in Python using the Flask framework, with a SQLite database, HTML templates rendered with Jinja, custom CSS, and a small amount of JavaScript. It follows the same overall structure as the CS50 Finance problem set, which gave me a solid foundation for user accounts, sessions, and database queries.
