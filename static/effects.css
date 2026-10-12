@@ -1,0 +1,702 @@
+/* =====================================================================
+   TIME TO GET REAL: effects.css
+   Loads AFTER styles.css and layers the over-the-top look on top.
+   Remove its <link> line in layout.html to get the original design back.
+
+   Hooks this file expects (added in layout.html / effects.js / shader.js):
+     html.fx-webgl      WebGL background is running
+     html.chaos-on      Chaos Mode switch is on
+     html.calm-on       Calm Mode switch is on (no flashing, no heavy motion)
+     html.runaway       pieces are currently flying around the screen
+     html.fx-snap       pieces are snapping back home (fast return)
+     html.fx-shaking    hype button screen shake
+     #fx-canvas         full-screen WebGL canvas
+     .fx-bg-fallback    animated CSS gradient if WebGL is unavailable
+     .fx-blobs          morphing color blobs
+     .fx-drips          paint drips under the header
+     .fx-piece          a button/link/card that can fly away
+     .fx-word / .fx-letter   text split into letters that can fly away
+
+   RULE: runaway motion uses the CSS `translate` and `rotate` properties
+   (set by effects.js). Nothing in this file animates those two
+   properties, so the effects and the runaway never fight each other.
+
+   FLASHING SAFETY: no flash anywhere runs faster than 2 per second
+   (limit is 3), and nothing flashes full-screen.
+   ===================================================================== */
+
+/* ===== Background layers ===== */
+html {
+    background: #0b0f1a;
+}
+
+body {
+    background: transparent;
+    min-height: 100vh;
+}
+
+.fx-bg-fallback {
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    background: linear-gradient(125deg, #ff0080, #7928ca, #00d4ff, #00ff88, #ffcc00, #ff4d00, #ff0080);
+    background-size: 400% 400%;
+    animation: fx-flow-bg 18s ease-in-out infinite;
+}
+
+.fx-webgl .fx-bg-fallback {
+    display: none;
+}
+
+#fx-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    pointer-events: none;
+}
+
+.fx-webgl #fx-canvas {
+    opacity: 1;
+}
+
+/* ===== Morphing blobs ===== */
+.fx-blobs {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.fx-blob {
+    position: absolute;
+    width: 42vmax;
+    height: 42vmax;
+    opacity: 0.45;
+    mix-blend-mode: screen;
+    animation:
+        fx-morph 14s ease-in-out infinite,
+        fx-drift 26s ease-in-out infinite alternate,
+        fx-hue 10s linear infinite;
+}
+
+.fx-blob:nth-child(1) { top: -12vmax; left: -10vmax; background: radial-gradient(circle at 35% 35%, #ff2d95, transparent 65%); }
+.fx-blob:nth-child(2) { top: 30vh; right: -14vmax; background: radial-gradient(circle at 40% 40%, #00e5ff, transparent 65%); animation-delay: -4s, -9s, -2s; }
+.fx-blob:nth-child(3) { bottom: -16vmax; left: 20vw; background: radial-gradient(circle at 50% 50%, #b6ff00, transparent 65%); animation-delay: -8s, -15s, -5s; }
+.fx-blob:nth-child(4) { top: 10vh; left: 40vw; width: 28vmax; height: 28vmax; background: radial-gradient(circle at 50% 50%, #ffb300, transparent 65%); animation-delay: -2s, -20s, -7s; }
+
+/* ===== Header: running water + drips ===== */
+.site-header {
+    position: relative;
+    z-index: 3;
+    background: linear-gradient(180deg, #05070d, #141b2b);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* Flowing water streaks across the header */
+.site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        115deg,
+        transparent 0 40px,
+        rgba(0, 229, 255, 0.10) 40px 60px,
+        transparent 60px 110px,
+        rgba(255, 45, 149, 0.08) 110px 125px
+    );
+    background-size: 400px 100%;
+    animation: fx-water 4s linear infinite;
+    pointer-events: none;
+}
+
+/* Rippling wave along the bottom edge */
+.site-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 12px;
+    background: radial-gradient(circle at 10px -2px, #141b2b 9px, transparent 10px);
+    background-size: 20px 12px;
+    animation: fx-ripple 1.6s linear infinite;
+    pointer-events: none;
+}
+
+.nav {
+    position: relative;
+    z-index: 1;
+}
+
+.fx-drips {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.fx-drips span {
+    position: absolute;
+    top: 0;
+    width: 10px;
+    height: 16px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: #ff2d95;
+    box-shadow: 0 0 12px currentColor;
+    transform-origin: top center;
+    animation: fx-drip 3.2s cubic-bezier(0.55, 0, 0.9, 0.4) infinite, fx-hue 6s linear infinite;
+}
+
+.fx-drips span:nth-child(1) { left: 6%;  animation-delay: 0s, 0s; background: #ff2d95; }
+.fx-drips span:nth-child(2) { left: 19%; animation-delay: -1.1s, -1s; background: #00e5ff; width: 8px; }
+.fx-drips span:nth-child(3) { left: 33%; animation-delay: -2.3s, -2s; background: #b6ff00; }
+.fx-drips span:nth-child(4) { left: 47%; animation-delay: -0.6s, -3s; background: #ffb300; width: 12px; }
+.fx-drips span:nth-child(5) { left: 61%; animation-delay: -1.8s, -4s; background: #c2362f; }
+.fx-drips span:nth-child(6) { left: 74%; animation-delay: -2.7s, -1.5s; background: #1d5bb8; width: 9px; }
+.fx-drips span:nth-child(7) { left: 86%; animation-delay: -0.3s, -2.5s; background: #e3b23c; }
+.fx-drips span:nth-child(8) { left: 95%; animation-delay: -1.5s, -3.5s; background: #2f8a4c; width: 7px; }
+
+/* ===== Brand: liquid rainbow text with a flashing REAL ===== */
+.brand {
+    background: linear-gradient(90deg, #ff2d95, #ffb300, #b6ff00, #00e5ff, #a855f7, #ff2d95);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fx-flow 5s linear infinite;
+    font-size: 1.9rem;
+    letter-spacing: 0.02em;
+    filter: drop-shadow(0 0 8px rgba(255, 45, 149, 0.45));
+}
+
+.brand .real {
+    display: inline-block;
+    -webkit-text-fill-color: #fff;
+    animation: fx-flash 1s steps(1) infinite, fx-pulse 1s ease-in-out infinite;
+}
+
+/* ===== Nav links ===== */
+.nav-links a {
+    transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.25s, color 0.25s;
+}
+
+.nav-links a:hover {
+    background: linear-gradient(120deg, #ff2d95, #a855f7, #00e5ff);
+    color: #fff;
+    transform: scale(1.12) rotate(-2deg);
+}
+
+/* ===== Navbar controls: toggles + hype button ===== */
+.fx-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.fx-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    color: #e6edf5;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+}
+
+.fx-toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.fx-track {
+    position: relative;
+    width: 46px;
+    height: 24px;
+    border-radius: 999px;
+    background: #3a4656;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+    transition: background 0.3s;
+}
+
+.fx-track::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.fx-toggle input:checked + .fx-track::after {
+    transform: translateX(22px);
+}
+
+.fx-toggle.chaos input:checked + .fx-track {
+    background: linear-gradient(90deg, #ff2d95, #ffb300, #b6ff00, #00e5ff, #ff2d95);
+    background-size: 300% 100%;
+    animation: fx-flow 2s linear infinite;
+    box-shadow: 0 0 14px #ff2d95;
+}
+
+.fx-toggle.calm input:checked + .fx-track {
+    background: #2f8a4c;
+}
+
+.fx-toggle input:focus-visible + .fx-track {
+    outline: 3px solid var(--plate-yellow);
+    outline-offset: 2px;
+}
+
+.hype-button {
+    padding: 0.4rem 0.95rem;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(120deg, #ff4d00, #ff2d95, #ffb300, #ff4d00);
+    background-size: 300% 100%;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    animation: fx-flow 3s linear infinite;
+    box-shadow: 0 0 16px rgba(255, 77, 0, 0.6);
+    transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.hype-button:hover {
+    transform: scale(1.12) rotate(3deg);
+}
+
+.hype-button:active {
+    transform: scale(0.92);
+}
+
+/* ===== Page panel: frosted glass so text stays readable ===== */
+.page {
+    position: relative;
+    z-index: 1;
+    margin: 2.25rem auto 3rem;
+    width: calc(100% - 1.5rem);
+    background: rgba(248, 249, 246, 0.86);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.flash {
+    position: relative;
+    z-index: 2;
+    border-radius: 10px;
+    border-left-width: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: fx-fold-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1.2) backwards;
+    transform-origin: top center;
+}
+
+/* ===== Headings: running liquid color ===== */
+h1 {
+    background: linear-gradient(90deg, #c2362f, #ff2d95, #a855f7, #1d5bb8, #00a3c4, #2f8a4c, #e3b23c, #c2362f);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fx-flow 8s linear infinite;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+}
+
+/* ===== Cards fold in like paper when the page loads ===== */
+.stat,
+.record-board,
+.form-card,
+.table-wrap,
+.chart-card,
+.empty,
+.apology {
+    animation: fx-fold-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1.2) backwards;
+    transform-origin: top center;
+    transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.35s;
+}
+
+.stats {
+    background: transparent;
+    border: 0;
+    gap: 0.9rem;
+    perspective: 900px;
+}
+
+.stat {
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    box-shadow: 0 8px 24px rgba(30, 41, 53, 0.12);
+}
+
+.stat:nth-child(2) { animation-delay: 0.12s; }
+.stat:nth-child(3) { animation-delay: 0.24s; }
+.stat:nth-child(4) { animation-delay: 0.36s; }
+
+.record-board { animation-delay: 0.3s; }
+.table-wrap { animation-delay: 0.45s; }
+
+/* 3D tilt on hover */
+.stat:hover,
+.chart-card:hover,
+.empty:hover {
+    transform: perspective(700px) rotateX(7deg) translateY(-5px);
+    box-shadow: 0 18px 40px rgba(30, 41, 53, 0.25);
+}
+
+/* ===== Record board: neon edge + rows that fold in one by one ===== */
+.record-board {
+    background: linear-gradient(160deg, #0d1220, #1e2935 60%, #2a1838);
+    box-shadow: 0 0 0 2px rgba(255, 45, 149, 0.35), 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.record {
+    animation: fx-fold-row 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) backwards;
+    transform-origin: left center;
+}
+
+.record:nth-child(1) { animation-delay: 0.55s; }
+.record:nth-child(2) { animation-delay: 0.65s; }
+.record:nth-child(3) { animation-delay: 0.75s; }
+.record:nth-child(4) { animation-delay: 0.85s; }
+.record:nth-child(5) { animation-delay: 0.95s; }
+.record:nth-child(6) { animation-delay: 1.05s; }
+.record:nth-child(n + 7) { animation-delay: 1.15s; }
+
+.record-weight {
+    background: linear-gradient(90deg, #ffb300, #ff2d95, #00e5ff, #b6ff00, #ffb300);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fx-flow 4s linear infinite;
+}
+
+/* ===== Buttons: liquid gradient that morphs on hover ===== */
+.button {
+    background: linear-gradient(120deg, #1d5bb8, #a855f7, #ff2d95, #ff4d00, #1d5bb8);
+    background-size: 300% 100%;
+    border-radius: 10px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 6px 18px rgba(168, 85, 247, 0.4);
+    animation: fx-flow 6s linear infinite;
+    transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), border-radius 0.4s, box-shadow 0.25s;
+}
+
+.button:hover {
+    background: linear-gradient(120deg, #1d5bb8, #a855f7, #ff2d95, #ff4d00, #1d5bb8);
+    background-size: 300% 100%;
+    border-radius: 30px 8px 30px 8px;
+    transform: scale(1.06);
+    box-shadow: 0 10px 28px rgba(255, 45, 149, 0.55);
+}
+
+.button:active {
+    transform: scale(0.95);
+}
+
+.button-delete {
+    transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.25s, color 0.25s;
+}
+
+.button-delete:hover {
+    background: var(--plate-red);
+    color: #fff;
+    transform: scale(1.1) rotate(-3deg);
+}
+
+/* ===== Form fields glow when focused ===== */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25), 0 0 18px rgba(255, 45, 149, 0.25);
+}
+
+.form-card,
+.chart-card,
+.table-wrap,
+.empty {
+    border-radius: 16px;
+    box-shadow: 0 12px 34px rgba(30, 41, 53, 0.14);
+}
+
+/* ===== CHAOS MODE: everything gets louder ===== */
+.chaos-on .fx-blob {
+    opacity: 0.7;
+    animation-duration: 6s, 12s, 4s;
+}
+
+.chaos-on .brand .real {
+    animation-duration: 0.5s, 0.5s;   /* 2 flashes per second, under the 3/sec limit */
+}
+
+.chaos-on h1 {
+    animation: fx-flow 2.5s linear infinite, fx-wobble 3s ease-in-out infinite;
+}
+
+.chaos-on .stat,
+.chaos-on .record-board,
+.chaos-on .form-card,
+.chaos-on .table-wrap,
+.chaos-on .chart-card,
+.chaos-on .empty,
+.chaos-on .apology {
+    animation: fx-glow 3s linear infinite;
+}
+
+.chaos-on .button {
+    animation: fx-flow 1.5s linear infinite, fx-jelly 2.4s ease-in-out infinite;
+}
+
+.chaos-on .fx-drips span {
+    animation-duration: 1.8s, 3s;
+}
+
+/* ===== RUNAWAY: pieces and letters flying around the screen ===== */
+.fx-word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.fx-letter {
+    display: inline-block;
+}
+
+.fx-piece,
+.fx-letter {
+    transition:
+        translate 1.6s cubic-bezier(0.3, 0.7, 0.2, 1),
+        rotate 1.6s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.runaway .fx-piece,
+.runaway .fx-letter {
+    position: relative;
+    z-index: 50;
+    will-change: translate, rotate;
+}
+
+.fx-snap .fx-piece,
+.fx-snap .fx-letter {
+    transition-duration: 0.35s;
+}
+
+/* Let pieces escape boxes that would normally clip them */
+.runaway .table-wrap,
+.runaway .chart-box {
+    overflow: visible;
+}
+
+/* Gradient text can't follow letters that fly away, so give flying
+   letters solid neon colors instead */
+.runaway .brand,
+.runaway h1,
+.runaway .record-weight {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.runaway .brand { color: #fff; }
+.runaway h1 { color: var(--iron); }
+.runaway .record-weight { color: #ffb300; }
+
+.runaway .fx-letter:nth-child(4n + 1) { color: #ff2d95; }
+.runaway .fx-letter:nth-child(4n + 2) { color: #00a3c4; }
+.runaway .fx-letter:nth-child(4n + 3) { color: #a855f7; }
+.runaway .fx-letter:nth-child(4n + 4) { color: #e38a00; }
+
+.runaway .fx-letter {
+    -webkit-text-fill-color: currentColor;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* ===== Hype button: giant message + screen shake ===== */
+.fx-hype-pop {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1000;
+    width: min(92vw, 900px);
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #fff;
+    -webkit-text-stroke: 2px #05070d;
+    text-shadow: 0 0 20px #ff2d95, 0 0 40px #ffb300, 6px 6px 0 #05070d;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: fx-hype 2.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+}
+
+.fx-shaking .site-header,
+.fx-shaking .page {
+    animation: fx-shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ===== CALM MODE + reduced motion: no flashing, no heavy motion ===== */
+html.calm-on *,
+html.calm-on *::before,
+html.calm-on *::after {
+    animation: none !important;
+}
+
+html.calm-on .fx-blobs,
+html.calm-on .fx-drips {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fx-blobs,
+    .fx-drips {
+        display: none;
+    }
+}
+
+/* ===== Small screens ===== */
+@media (max-width: 600px) {
+    .page {
+        margin-top: 1.25rem;
+        border-radius: 14px;
+    }
+
+    .brand {
+        font-size: 1.55rem;
+    }
+}
+
+/* ===== Keyframes ===== */
+@keyframes fx-flow {
+    from { background-position: 0% 50%; }
+    to   { background-position: 300% 50%; }
+}
+
+@keyframes fx-flow-bg {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes fx-water {
+    from { background-position: 0 0; }
+    to   { background-position: 400px 0; }
+}
+
+@keyframes fx-ripple {
+    from { background-position: 0 0; }
+    to   { background-position: 20px 0; }
+}
+
+@keyframes fx-drip {
+    0%   { transform: translateY(-8px) scaleY(0.3); opacity: 0; }
+    15%  { transform: translateY(-4px) scaleY(1.6); opacity: 1; }
+    45%  { transform: translateY(10px) scaleY(1.2); opacity: 1; }
+    100% { transform: translateY(140px) scaleY(0.9); opacity: 0; }
+}
+
+@keyframes fx-hue {
+    from { filter: hue-rotate(0deg); }
+    to   { filter: hue-rotate(360deg); }
+}
+
+@keyframes fx-morph {
+    0%, 100% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+    25%      { border-radius: 70% 30% 46% 54% / 30% 39% 61% 70%; }
+    50%      { border-radius: 30% 70% 30% 70% / 60% 40% 60% 40%; }
+    75%      { border-radius: 55% 45% 35% 65% / 70% 30% 70% 30%; }
+}
+
+@keyframes fx-drift {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+    50%  { transform: translate(8vw, 6vh) rotate(160deg) scale(1.15); }
+    100% { transform: translate(-6vw, 10vh) rotate(320deg) scale(0.9); }
+}
+
+/* Two color changes per cycle; at 1s that's 1 flash/sec, at 0.5s it's 2/sec */
+@keyframes fx-flash {
+    0%  { -webkit-text-fill-color: #ffffff; text-shadow: 0 0 14px #ff2d95; }
+    50% { -webkit-text-fill-color: #ffe14a; text-shadow: 0 0 18px #00e5ff; }
+}
+
+@keyframes fx-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.12); }
+}
+
+@keyframes fx-fold-in {
+    0%   { transform: perspective(900px) rotateX(-85deg); opacity: 0; }
+    60%  { transform: perspective(900px) rotateX(12deg); opacity: 1; }
+    100% { transform: perspective(900px) rotateX(0deg); opacity: 1; }
+}
+
+@keyframes fx-fold-row {
+    0%   { transform: perspective(700px) rotateY(-80deg); opacity: 0; }
+    100% { transform: perspective(700px) rotateY(0deg); opacity: 1; }
+}
+
+@keyframes fx-wobble {
+    0%, 100% { transform: skewX(0deg); }
+    25%      { transform: skewX(-6deg); }
+    75%      { transform: skewX(6deg); }
+}
+
+@keyframes fx-glow {
+    0%   { box-shadow: 0 0 0 3px #ff2d95, 0 0 28px rgba(255, 45, 149, 0.6); }
+    25%  { box-shadow: 0 0 0 3px #ffb300, 0 0 28px rgba(255, 179, 0, 0.6); }
+    50%  { box-shadow: 0 0 0 3px #00e5ff, 0 0 28px rgba(0, 229, 255, 0.6); }
+    75%  { box-shadow: 0 0 0 3px #b6ff00, 0 0 28px rgba(182, 255, 0, 0.6); }
+    100% { box-shadow: 0 0 0 3px #ff2d95, 0 0 28px rgba(255, 45, 149, 0.6); }
+}
+
+@keyframes fx-jelly {
+    0%, 100% { border-radius: 10px; }
+    30%      { border-radius: 30px 8px 30px 8px; }
+    60%      { border-radius: 8px 30px 8px 30px; }
+}
+
+@keyframes fx-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    15%      { transform: translate(-14px, 6px) rotate(-1.5deg); }
+    30%      { transform: translate(12px, -8px) rotate(1.5deg); }
+    45%      { transform: translate(-10px, 4px) rotate(-1deg); }
+    60%      { transform: translate(8px, -4px) rotate(1deg); }
+    80%      { transform: translate(-4px, 2px) rotate(0deg); }
+}
+
+@keyframes fx-hype {
+    0%   { transform: translate(-50%, -50%) perspective(800px) rotateX(-90deg) scale(0.4); opacity: 0; }
+    15%  { transform: translate(-50%, -50%) perspective(800px) rotateX(15deg) scale(1.15); opacity: 1; }
+    25%  { transform: translate(-50%, -50%) perspective(800px) rotateX(0deg) scale(1); }
+    80%  { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}

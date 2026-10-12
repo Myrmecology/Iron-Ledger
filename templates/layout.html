@@ -6,19 +6,45 @@
         <meta charset="utf-8">
         <meta name="viewport" content="initial-scale=1, width=device-width">
 
+        <!-- Apply saved Chaos / Calm settings before the page draws (prevents a flicker) -->
+        <script>
+            (function () {
+                var root = document.documentElement;
+                try {
+                    if (sessionStorage.getItem("ttgr-chaos")) { root.classList.add("chaos-on"); }
+                    if (localStorage.getItem("ttgr-calm")) { root.classList.add("calm-on"); }
+                } catch (error) {}
+            })();
+        </script>
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
         <link href="/static/styles.css" rel="stylesheet">
 
-        <title>Iron Ledger: {% block title %}{% endblock %}</title>
+        <!-- TIME TO GET REAL effects: remove any one of these lines to switch that part off -->
+        <link href="/static/effects.css" rel="stylesheet">
+        <script src="/static/shader.js" defer></script>
+        <script src="/static/effects.js" defer></script>
+
+        <title>Time To Get REAL: {% block title %}{% endblock %}</title>
     </head>
 
     <body>
 
+        <!-- Background layers: CSS gradient fallback, WebGL liquid, morphing blobs -->
+        <div class="fx-bg-fallback" aria-hidden="true"></div>
+        <canvas id="fx-canvas" aria-hidden="true"></canvas>
+        <div class="fx-blobs" aria-hidden="true">
+            <span class="fx-blob"></span>
+            <span class="fx-blob"></span>
+            <span class="fx-blob"></span>
+            <span class="fx-blob"></span>
+        </div>
+
         <header class="site-header">
             <nav class="nav">
-                <a class="brand" href="/">Iron Ledger</a>
+                <a class="brand" href="/">Time To Get <span class="real">REAL</span></a>
                 <ul class="nav-links">
                     {% if session["user_id"] %}
                         <li><a href="/" {% if request.path == "/" %}aria-current="page"{% endif %}>Dashboard</a></li>
@@ -31,7 +57,24 @@
                         <li><a href="/register" {% if request.path == "/register" %}aria-current="page"{% endif %}>Register</a></li>
                     {% endif %}
                 </ul>
+                <div class="fx-controls">
+                    <label class="fx-toggle chaos" title="Sit still for 5 seconds and see what happens">
+                        <input type="checkbox" id="chaos-toggle">
+                        <span class="fx-track" aria-hidden="true"></span>
+                        Chaos
+                    </label>
+                    <label class="fx-toggle calm" title="Turns off flashing and heavy motion">
+                        <input type="checkbox" id="calm-toggle">
+                        <span class="fx-track" aria-hidden="true"></span>
+                        Calm
+                    </label>
+                    <button class="hype-button" id="hype-button" type="button">Hype</button>
+                </div>
             </nav>
+            <div class="fx-drips" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+            </div>
         </header>
 
         {% with messages = get_flashed_messages() %}
